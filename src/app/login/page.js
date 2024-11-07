@@ -3,12 +3,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import axios, {isCancel, AxiosError} from 'axios';
 import toast from "react-hot-toast";
-export default function Register() {
+export default function Login() {
   const [timestamp, setTimestamp] = useState(null);
   const [isClient, setIsClient] = useState(false);
 
+  const router = useRouter();
+
+  const navigateTo = (path) => {
+    router.push(path);
+  };
+
+  const handleSignUp = ()=>{
+    navigateTo('/register')
+  }
   useEffect(() => {
     setIsClient(true);
     setTimestamp(Date.now());
@@ -17,30 +27,32 @@ export default function Register() {
   if (!isClient) return null;
   const handleRegister = async (e)=> {
     e.preventDefault();
-    const username = (e.target.elements.username.value);
     const email = (e.target.elements.email.value);
     const password = (e.target.elements.password.value);
     try {
-        const response = await axios.post("http://127.0.0.1:8000/user/add", null, {
-            params: {
-              username: username,
-              email: email,
-              password: password
-            }
-          });
+        const form = new FormData();
+        form.append("username", email);
+        form.append("password", password);
+
+      const response = await axios.post("http://127.0.0.1:8000/login", form, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      });
       
 
         console.log('RESPONSE IS\n\n')
         if (response.request.status === 200){
-            toast.success('User Registered Successfully')
+            toast.success('User Logged in Successfully')
         }
 
-        // localStorage.setItem('access_token', response.data.access_token);
-        console.log('INSIDE TRY');
+        localStorage.setItem('access_token', response.data.access_token);
+        console.log("LOGIN ACCESS TOKEN IS ", response.data.access_token)
+        navigateTo('/dashboard')
         
     } catch (err) {
-        console.log("Error registering user:", err.response.status);
-        toast.error('Email Already exists')
+        console.log("Error registering user:", err.response);
+        toast.error('Invalid Credentials')
  
     }
     
@@ -48,13 +60,13 @@ export default function Register() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <Card className="w-full max-w-md p-6 rounded-lg shadow-lg bg-white">
-        <h2 className="text-2xl font-semibold mb-5 text-center">Register</h2>
+        <h2 className="text-2xl font-semibold mb-5 text-center">Login</h2>
         <form className="space-y-5" onSubmit={handleRegister}>
-          <Input label="Username" name="username" type="text" required placeholder="Enter your username" />
           <Input label="Email" name="email" type="email" required placeholder="Enter your email" />
           <Input label="Password" name="password" type="password" required placeholder="Enter your password" />
-          <Button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 text-white">Sign Up</Button>
+          <Button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 text-white">Login</Button>
         </form>
+        <Button onClick={handleSignUp} className="w-full my-2 bg-blue-500 hover:bg-blue-600 text-white">Not a user? Sign Up</Button>
       </Card>
     </div>
   );

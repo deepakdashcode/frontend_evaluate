@@ -1,11 +1,26 @@
-"use client";
-import { useEffect, useState } from "react";
+'use client';
+import QuizForm from "@/components/myComponents/QuizForm";
 import axios from "axios";
-import { useRouter } from "next/router";
-import toast from "react-hot-toast";
 
-export default function Dashboard() {
+import  { use, useEffect, useState } from "react";
+
+
+
+const AttemptQuiz =  ( { params } )=> {
+    const { quizid } = use(params);
+    const [questions, setQuestions] = useState([])
     const [userData, setUserData] = useState(null);
+
+
+    const getQuestions = async (quizid) => {
+        try {
+            const response = await axios.get(`http://127.0.0.1:8000/quiz/${quizid}`);
+            const data = response.data; // Assuming the response is an array
+            setQuestions(data);
+          } catch (error) {
+            console.log('There was an error fetching the quiz data:', error);
+          }
+    }
 
     useEffect(() => {
         const token = localStorage.getItem('access_token');
@@ -30,7 +45,7 @@ export default function Dashboard() {
                     throw new Error(`HTTP error! status: ${response.status}, details: ${JSON.stringify(errorDetails)}`);
                 }
         
-                const data = await response.json();
+                const data = await response.data;
                 console.log("User data:", data);
                 setUserData(data)
             } catch (error) {
@@ -38,19 +53,19 @@ export default function Dashboard() {
             }
         }
         fetchUserData();
+        getQuestions(quizid);
     }, []);
+
+
 
     return (
         <div>
-            <h1>Dashboard</h1>
-            {userData ? (
-                <div>
-                    <p>Email: {userData.email}</p>
-                    <p>Username: {userData.username}</p>
-                </div>
-            ) : (
-                <p>Loading...</p>
-            )}
+            
+            {
+            <QuizForm questions={questions} quiz_id={quizid}/>
+            }
         </div>
-    );
+    )
 }
+
+export default AttemptQuiz;
