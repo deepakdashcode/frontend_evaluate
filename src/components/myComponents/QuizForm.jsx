@@ -32,10 +32,7 @@ export default function QuizForm({ questions = [], quiz_id }) {
                 }
               });
     
-            // if (!response.ok) {
-            //     const errorDetails = await response.data;
-            //     throw new Error(`HTTP error! status: ${response.status}, details: ${JSON.stringify(errorDetails)}`);
-            // }
+
     
             const data = await response.data;
             setUserData(data);
@@ -66,7 +63,18 @@ const handleSubmit = async () => {
           ...answers
         ])
       })
-      .then(response => response.json())
+      .then(response => {
+        const response_code = response.status;
+        if (response_code == 208){
+          toast.error('Already Attempted test');
+        }
+        else if(response_code == 200)
+        {
+          toast.success("Test Submitted Successfully");
+        }
+        console.log(response);
+        return response.json();
+      } )
       .then(data => console.log(data))
       .catch(error => console.error('Error:', error));
     // toast.success("Answer submitted successfully you can now close this tab")

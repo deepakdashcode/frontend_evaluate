@@ -20,7 +20,7 @@ import {
   } from "@/components/ui/drawer"
 
 export default function Dashboard() {
-    const [quizId, setQuizId] = useState(0);
+    const [quizId, setQuizId] = useState();
     const [isOpen, setIsOpen] = useState(false);
     // Function to handle form submit
     const handleSubmit = (e) => {
@@ -89,6 +89,19 @@ export default function Dashboard() {
         console.log("NAVIGATING TO ", gotoRoute)
         navigateTo(gotoRoute);
     }
+
+    const handleAttempted = async (e) => {
+      e.preventDefault();
+      navigateTo('attempted/')
+    }
+    const handleCreated = async (e) => {
+      e.preventDefault();
+      navigateTo('created/')
+    }
+    const handleEvaluate = async (e) => {
+      e.preventDefault();
+      navigateTo('evaluate/')
+    }
     
     return (
         <div>
@@ -131,15 +144,15 @@ export default function Dashboard() {
                         </DrawerContent>
                     </Drawer>
                     
-                    <Button variant="outline" onClick={() => console.log('Evaluate clicked')}>
+                    <Button variant="outline" onClick={handleEvaluate}>
                       Evaluate
                     </Button>
 
-                    <Button variant="outline" onClick={() => console.log('Evaluate clicked')}>
+                    <Button variant="outline" onClick={handleCreated}>
                       Created Quizs
                     </Button>
 
-                    <Button variant="outline" onClick={() => console.log('Evaluate clicked')}>
+                    <Button variant="outline" onClick={handleAttempted}>
                       Attempted Quizs
                     </Button>
                 </div>
